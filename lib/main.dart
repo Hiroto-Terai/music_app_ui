@@ -1,3 +1,5 @@
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -25,6 +27,31 @@ class _MusicAppState extends State<MusicApp> {
   bool playing = false;
   // メインの状態の再生ボタンの状態
   IconData playBtn = Icons.play_arrow;
+
+  // ミュージックプレイヤーを作成
+  // 必要なオブジェクトを定義
+  AudioPlayer _player;
+  AudioCache cache;
+
+  // 現在再生している時間を保持
+  Duration position = new Duration();
+  // 曲の長さ
+  Duration musicLength = new Duration();
+
+  // スライダー
+  Widget slider() {
+    return Slider(
+        value: position.inSeconds.toDouble(),
+        max: musicLength.inSeconds.toDouble(),
+        onChanged: (value) {
+          seekToSec(value.toInt());
+        });
+  }
+
+  void seekToSec(int sec) {
+    Duration newPos = Duration(seconds: sec);
+    _player.seek(newPos);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +159,28 @@ class _MusicAppState extends State<MusicApp> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       // 操作パネルのパーツ群
                       children: [
+                        Container(
+                          width: 500.0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "${position.inMinutes}:${position.inSeconds.remainder(60)}",
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                              slider(),
+                              Text(
+                                "${musicLength.inMinutes}:${musicLength.inSeconds.remainder(60)}",
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         // スキップ、再生ボタン
                         Row(
                           // 中央に揃える
